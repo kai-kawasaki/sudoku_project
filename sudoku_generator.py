@@ -151,13 +151,13 @@ class SudokuGenerator:
     '''
 
     def is_valid(self, row, col, num):
-        if (valid_in_row(row, num) == False):
+        if (self.valid_in_row(row, num) == False):
             return False
 
-        if (valid_in_col(col, num) == False):
+        if (self.valid_in_col(col, num) == False):
             return False
 
-        if (valid_in_box(row // 3, col // 3) == False):
+        if (self.valid_in_box(row // 3, col // 3) == False):
             return False
 
         return True
@@ -197,7 +197,7 @@ class SudokuGenerator:
     def fill_diagonal(self):
         n = 0
         while n < 3:
-            fill_box(n, n)
+            self.fill_box(n, n)
             n += 1
 
     '''
