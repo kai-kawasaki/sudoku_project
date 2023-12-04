@@ -180,7 +180,7 @@ class SudokuGenerator:
 
         while row_start <= row_end:
             while col_start <= col_end:
-                self.board[row_start][col_start] == random.choices(mylist, k=1)
+                self.board[row_start][col_start] == random.choices(num_list, k=1)
                 num_list.remove(self.board[row_start][col_start])
                 col_start += 1
             col_start -= 2
