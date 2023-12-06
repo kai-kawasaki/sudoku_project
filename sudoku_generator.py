@@ -135,10 +135,12 @@ class SudokuGenerator:
 	Return: boolean
     '''
 
-    def valid_in_box(self, row_start, col_start, num):
+    def valid_in_box(self, row_start, col_start, num):  # checks if 3 by 3 is valid
+        row = row_start//self.box_length
+        col = col_start//self.box_length
         for x in range(self.box_length):
             for y in range(self.box_length):
-                if self.board[row_start+x][col_start+y] == num:
+                if self.board[row*3+x][col*3+y] == num:
                     return False
         return True
 
@@ -154,15 +156,12 @@ class SudokuGenerator:
     '''
 
     def is_valid(self, row, col, num):
-        if (self.valid_in_row(row, num) == False):
+        if not self.valid_in_row(row, num):
             return False
-
-        if (self.valid_in_col(col, num) == False):
+        if not self.valid_in_col(col, num):
             return False
-
-        if (self.valid_in_box(row // 3, col // 3, num) == False):
+        if not self.valid_in_box(row, col, num):
             return False
-
         return True
 
     '''
@@ -275,7 +274,6 @@ class SudokuGenerator:
             if self.board[row][col] != 0:
                 self.board[row][col] = 0
                 count += 1
-                print(count)
 
 
 '''
@@ -298,10 +296,11 @@ Return: list[list] (a 2D Python list to represent the board)
 def generate_sudoku(size, removed):
     sudoku = SudokuGenerator(size, removed)
     sudoku.fill_values()
+
+
+    board = sudoku.get_board()
+    sudoku.remove_cells()
+    board = sudoku.get_board()
     sudoku.print_board()
 
-
-    board = sudoku.get_board()
-    # sudoku.remove_cells()
-    board = sudoku.get_board()
     return board
