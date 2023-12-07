@@ -2,18 +2,16 @@ import pygame, sys
 import pygame.freetype
 from board import Board
 
-# pygame setup
+# setup of constants
 WIDTH = 540
 HEIGHT = 600
-CELL_SIZE = 60
-SQUARE_SIZE = 180
+CELL_SPACING = 60
+GROUP_SIZE = 180
 running = True
 
 
 
-# textReset = pygame.image.load("textReset.png")
-
-#colors
+#color pallet
 dark_moss = (81, 75, 35)
 moss = (101, 104, 57)
 sage = (203, 201, 173)
@@ -25,7 +23,7 @@ def main_screen(screen):
     
     game_screen = 0
 
-    # fill the screen with a color to wipe away anything from last frame
+    # wipe the screen with the background
     screen.fill(dark_moss)
 
     if (game_screen == 0): # title
@@ -37,7 +35,7 @@ def main_screen(screen):
         pygame.draw.line(screen, moss, (359,540), (359, 599),width=4)
         pygame.draw.line(screen, moss, (537,540), (537, 599),width=4)
 
-        # text
+        # title text
         title_font = pygame.freetype.Font("NexaRustSans-Black.ttf", 100)
         title_surface, rect = title_font.render("SUDOKU", ash)
         screen.blit(title_surface, (40, 200))
@@ -49,7 +47,7 @@ def main_screen(screen):
         center=(WIDTH // 2, HEIGHT // 2)
         screen.blit(title_surface2, (85, 450))
 
-        # Initialize buttons.
+        # creating buttons
         easy_text = button_font.render("Easy", moss)
         medium_text = button_font.render("Medium", moss)
         hard_text = button_font.render("Hard", moss)
@@ -74,26 +72,23 @@ def main_screen(screen):
                     case pygame.QUIT:
                         sys.exit()
                     case pygame.MOUSEBUTTONDOWN:
-                        if easy_rectangle.collidepoint(event.pos):  # Easy removes 30 cells
-                            print("TEST")
+                        if easy_rectangle.collidepoint(event.pos):  # 30 cells
                             return 30
-                        if medium_rectangle.collidepoint(event.pos):  # Medium removes 40 cells
-                            print("TEST 2")
+                        if medium_rectangle.collidepoint(event.pos):  # 40 cells
                             return 40
-                        if hard_rectangle.collidepoint(event.pos):  # Hard removes 50 cells
-                            print("TEST 3")
+                        if hard_rectangle.collidepoint(event.pos):  # 50 cells
                             return 50
             pygame.display.update()
 
 
-def win_screen(screen):
+def win_screen(screen): # winning screen
     screen.fill(mist)
     win_font = pygame.freetype.Font("NexaRustSans-Black.ttf", 100)
     win_surface, rect = win_font.render("WIN", ash)
     screen.blit(win_surface, (40, 200))
 
 
-def lose_screen(screen):
+def lose_screen(screen): # losing screen
     screen.fill(dark_moss)
     lose_font = pygame.freetype.Font("NexaRustSans-Black.ttf", 100)
     lose_surface, rect = lose_font.render("LOSE", ash)
@@ -103,11 +98,11 @@ def win_check(screen, main_board):
     win = True
     for row in range(9):
         for col in range(9):
-            main_board.sudoku.board[row][col] = 0
-            if main_board.sudoku.is_valid(row, col,) == False:
+            main_board.board[row][col] = 0
+            if main_board.is_valid(row, col, main_board.cells[row][col].sketch_value) == False: # confirms if pplayer input
                 win = False
-            main_board.sudoku.board[row][col] = main_board.cells[row][col].sketched_value
-            if main_board.cells[row][col].value == "0" and main_board.cells[row][col].sketched_value == 0:
+            main_board.board[row][col] = main_board.cells[row][col].sketch_value
+            if main_board.cells[row][col].value == "0" and main_board.cells[row][col].sketch_value == 0:
                 win = False
     if win:
         win_screen(screen)
@@ -117,23 +112,25 @@ def win_check(screen, main_board):
 
 def sudo_buttons(main_board, screen, event, difficulty):
     result = True
-    if main_board.reset_rectangle.collidepoint(event.pos):  # Reset button resets the board.
+    if main_board.reset_rect.collidepoint(event.pos):  # resets the board
         screen.fill(moss)
         main_board = Board(WIDTH, HEIGHT, screen, difficulty)
         main_board.draw()
         pygame.display.update()
-    elif main_board.restart_rectangle.collidepoint(event.pos):  # Restart button takes you back to the start screen.
+    elif main_board.restart_rect.collidepoint(event.pos):  # back to the start menu
         main()
-    elif main_board.exit_rectangle.collidepoint(event.pos):  # Exits the program.
+    elif main_board.exit_rect.collidepoint(event.pos):  # Closes the program
         sys.exit()
     else:
         result = False
-    return [result, main_board]  # Returns if a button was pressed and the board with changes.
+    return [result, main_board]  
 
 
-def set_value(main_board, row, col, key):  # Inputs the entered value into the board 2d list and the UI board.
-    main_board.cells[row][col].set_sketched_value(f"{key}")
-    main_board.sudoku.board[row][col] = key
+def set_value(main_board, row, col, key):  # updates the board wit the new value
+    print(key)
+    main_board.update_value(row, col, f"{key}")
+    main_board.board[row][col] = key
+    print(main_board.board[row][col])
 
 def main():
     pygame.init()  # Initializes pygame.
@@ -152,14 +149,14 @@ def main():
             match event.type:
                 case pygame.QUIT:
                     sys.exit()
-                case pygame.KEYDOWN:  # If enter is pressed then it checks if the user won.
+                case pygame.KEYDOWN:  # If enter is pressed then win condition is checked
                     if event.key == pygame.K_RETURN:
                         win_check(screen, main_board)
                         break
                 case pygame.MOUSEBUTTONDOWN:  # If the user clicks.
                     buttons = sudo_buttons(main_board, screen, event, removed)
                     main_board = buttons[1]
-                    if not buttons[0]:  # If the user didn't click on one of the buttons at the bottom.
+                    if not buttons[0]:  # If the user didn't click on one of the buttons
                         # Checks which cell they clicked on.
                         for row in main_board.cells:
                             for col in main_board.cells[row]:
@@ -225,7 +222,7 @@ def main():
                                                 sys.exit()
                                             if event2.type == pygame.MOUSEBUTTONDOWN:  # Checks if button was pressed.
                                                 main_board = sudo_buttons(main_board, screen, event2, removed)[1]
-                                    main_board.cells[row][col].disable_highlight()  # Removes the highlight when done.
+                                    main_board.cells[row][col].disable_selection()  # Removes selection when cleared
 
 
 
