@@ -4,7 +4,7 @@ from board import Board
 
 
 def main():
-    generate_sudoku(9, 30)
+    board = generate_sudoku(9, 30)
 
 
 if __name__ == "__main__":
